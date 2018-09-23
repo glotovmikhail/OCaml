@@ -66,4 +66,58 @@ let is_alpha_equivalent expr1 expr2 =
 
 	equivalent expr1 expr2;;
 
-print_string (String.concat " " (free_vars (lambda_of_string "\\x.xy")) ^ "\n")
+let get2 (_, a) = a;;
+
+let refresh expr =
+	let counter = ref 0 in
+	let next_var() = let result = "tmp" ^ string_of_int !counter 
+					 in
+					     counter := !counter + 1;
+					   	 result in
+    let rec mpAdd l map = 
+    	match expr with
+    	         Var v -> if (MyMap.mem v map)
+    	         		  then (Var (MyMap.find v map))
+    	         		  else expr
+    	       | App(x, y) -> App(mpAdd x map, mpAdd y map)
+    	       | Abs(x, y) -> (let pro = next_var()
+    	   					   in (Abs(pro, mpAdd y (MyMap.add x pro map)))) in
+    	mpAdd expr MyMap.empty;;
+
+let normal_beta_reduction expr =
+	let rec var_subst expr new_var old_var =
+			match expr with
+				     Var v 	   -> if v = old_var
+				     		      then Var(new_var)
+				     		      else Var(v)
+				   | Abs(v, x) -> if v = old_var
+				   				  then Abs(new_var, var_subst x new_var old_var)
+				   				  else Abs(v, var_subst x new_var old_var)
+				   | App(x, y) -> App(var_subst x new_var old_var, var_subst y new_var old_var) in
+
+	let rec find_beta ex = 
+		match ex with
+			    Var x -> (false, Var x)
+			  | App(x, y) -> let check, newEx = find_beta x in
+			  				 	if check
+			  				 	then (true, App(newEx, y))
+			  				 	else let check, newEy = find_beta y in
+			  				 		 (check, App(newEx, newEy))
+			  | Abs(x, y) -> let check, newExpr = find_beta y in
+			  					(check, Abs(x, newExpr))
+			  | App(Abs(x, a), b) -> (true, var_subst a (string_of_lambda b) x) in
+    
+    get2 (find_beta (refresh expr));;
+
+let reduce_to_normal_form expr =
+	let newExpr = refresh expr in
+	let rec reduction_to_normal_form expr =
+		if (is_normal_form expr)
+		then expr
+		else reduction_to_normal_form (normal_beta_reduction expr) in
+    reduction_to_normal_form newExpr;;
+
+
+let from_bool b = if b
+				  then "true"
+				  else "false";;
