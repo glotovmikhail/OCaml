@@ -61,11 +61,15 @@ let rec lambda_of_string s =
         else 
             false in
     
-    
     let parse_ident() = 
-        let v = String.make 1 (get()) in
-        next();
-        v in
+        let rec impl s =
+            if (get ()) <> ' ' && (get ()) <> '.' && (get ()) <> ')' && not (is_finished ())  
+                then 
+                    let c = get() in
+                    next();
+                    impl (s ^ String.make 1 c)
+                else s in
+        impl "" in
            
     let rec parse_lambda() = match get() with
         '\\' -> let l = parse_abs () in
@@ -126,4 +130,3 @@ let rec merge_sort = function
 let rec print_list = function
     | [] -> ()
     | element::l -> print_int element ; print_string " " ; print_list l;;
-    
