@@ -90,10 +90,22 @@ let rec lambda_of_string s =
         Abs (v, l)
         
     and check l = 
-        if (is_finished() || get() = ')') then
-            l
-        else
-            App (l, parse_lambda()) in
+                if (is_finished () || s.[!pos] = ')') 
+                then l 
+                else    (eat ' '; 
+                        match (get ()) with 
+                            '\\' -> 
+                                    (let ans = parse_abs () in
+                                    check (App (l, ans))) 
+                            | '(' -> 
+                                    (eat '(';
+                                    let ans = parse_lambda () in
+                                    eat ')'; 
+                                    check (App(l, ans)))
+                            | _ ->  
+                                    (let ans = (Var (parse_ident())) in
+                                    check (App(l, ans)))
+                        ) in
             
     parse_lambda();;
 
@@ -130,3 +142,4 @@ let rec merge_sort = function
 let rec print_list = function
     | [] -> ()
     | element::l -> print_int element ; print_string " " ; print_list l;;
+
