@@ -11,5 +11,5 @@
   - [x] [free_vars](../master/hw1-reduction/hw1-reduction.ml)
   - [x] [is_normal_form](../master/hw1-reduction/hw1-reduction.ml)
   - [x] [is_alpha_equivalent](../master/hw1-reduction/hw1-reduction.ml)
-  - [-] [normal_beta_reduction](../master/hw1-reduction/hw1-reduction.ml)
-  - [-] [reduce_to_normal_form](../master/hw1-reduction/hw1-reduction.ml)
+  - [x] [normal_beta_reduction](../master/hw1-reduction/hw1-reduction.ml)
+  - [x] [reduce_to_normal_form](../master/hw1-reduction/hw1-reduction.ml)
